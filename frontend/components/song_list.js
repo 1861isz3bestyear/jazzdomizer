@@ -259,11 +259,8 @@
     const displayedHarmony = changedSong ? changedSong.musicInfo : song.musicInfo;
 
     return `
-      <h2>Информация о песне</h2>
-
+      <h2>${escapeHtml(song.description)}</h2>
       <div class="transposed-song-card" data-song-id="${escapeHtml(song.id)}">
-        <div class="song-title">${escapeHtml(song.description)}</div>
-
           <div class="transposed">
             <pre class="detail-value">${escapeHtml(displayedHarmony)}</pre>
           </div>
