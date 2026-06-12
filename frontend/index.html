@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Music database manager</title>
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+
+    <body>
+        <div id="app">
+            <header>
+                <h1>Jazzdomizer</h1>
+                <nav class="main-nav">
+                    <button onclick="router.navigate('songs')">
+                        Список песен
+                    </button>
+                    <button onclick="router.navigate('practice')">
+                        Режим тренировки
+                    </button>
+                </nav>
+            </header>
+
+            <main id="content">
+            </main>
+        </div>
+
+        <script src="components/api.js"></script>
+        <script src="components/song_list.js"></script>
+        <script src="components/practice_mode.js"></script>
+        <script src="app.js"></script>
+    </body>
+</html>
