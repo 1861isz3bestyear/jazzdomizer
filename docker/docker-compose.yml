@@ -1,0 +1,47 @@
+services:
+  postgres:
+    build:
+      context: .
+      dockerfile: postgres/Dockerfile
+    container_name: jazzdomizer-postgres
+    environment:
+      POSTGRES_DB: rust_sql_one_db
+      POSTGRES_USER: jazzdomizer
+      POSTGRES_PASSWORD: jazzdomizer
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jazzdomizer -d rust_sql_one_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: jazzdomizer-backend
+    environment:
+      APP_HOST: 0.0.0.0
+      APP_PORT: 3000
+      DATABASE_URL: postgres://jazzdomizer:jazzdomizer@postgres:5432/rust_sql_one_db
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: jazzdomizer-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      backend:
+        condition: service_started
+
+volumes:
+  postgres_data:
