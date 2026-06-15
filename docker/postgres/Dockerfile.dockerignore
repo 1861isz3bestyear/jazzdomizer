@@ -1,0 +1,6 @@
+*
+
+!postgres/
+!postgres/initdb/
+!postgres/initdb/001_schema.sql
+!postgres/initdb/002_data_only.sql

@@ -1,0 +1,11 @@
+*
+
+!backend/
+!backend/Cargo.toml
+!backend/Cargo.lock
+!backend/src/
+!backend/src/**
+
+!postgres/
+!postgres/initdb/
+!postgres/initdb/001_schema.sql

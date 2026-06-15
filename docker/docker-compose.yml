@@ -1,8 +1,10 @@
+name: jazzdomizer
+
 services:
   postgres:
     build:
-      context: .
-      dockerfile: postgres/Dockerfile
+      context: ..
+      dockerfile: docker/postgres/Dockerfile
     container_name: jazzdomizer-postgres
     environment:
       POSTGRES_DB: rust_sql_one_db
@@ -20,8 +22,8 @@ services:
 
   backend:
     build:
-      context: .
-      dockerfile: backend/Dockerfile
+      context: ..
+      dockerfile: docker/backend/Dockerfile
     container_name: jazzdomizer-backend
     environment:
       APP_HOST: 0.0.0.0
@@ -35,7 +37,8 @@ services:
 
   frontend:
     build:
-      context: ./frontend
+      context: ..
+      dockerfile: docker/frontend/Dockerfile
     container_name: jazzdomizer-frontend
     ports:
       - "8080:80"
