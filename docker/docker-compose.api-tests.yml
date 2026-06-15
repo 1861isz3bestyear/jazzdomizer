@@ -1,0 +1,44 @@
+name: jazzdomizer-api-tests
+
+services:
+  postgres:
+    build:
+      context: ..
+      dockerfile: docker/postgres/Dockerfile
+    environment:
+      POSTGRES_DB: rust_sql_one_db
+      POSTGRES_USER: jazzdomizer
+      POSTGRES_PASSWORD: jazzdomizer
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jazzdomizer -d rust_sql_one_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    tmpfs:
+      - /var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/backend/Dockerfile
+    environment:
+      APP_HOST: 0.0.0.0
+      APP_PORT: 3000
+      DATABASE_URL: postgres://jazzdomizer:jazzdomizer@postgres:5432/rust_sql_one_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api-tests:
+    build:
+      context: ..
+      dockerfile: docker/tests/api/Dockerfile
+    environment:
+      API_BASE_URL: http://backend:3000/api
+      DATABASE_URL: postgresql://jazzdomizer:jazzdomizer@postgres:5432/rust_sql_one_db
+      API_TEST_ARTIFACT_DIR: /artifacts
+    volumes:
+      - ../test-artifacts/api:/artifacts
+    depends_on:
+      backend:
+        condition: service_started
