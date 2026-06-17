@@ -9,6 +9,7 @@ ENV PYTHONUNBUFFERED=1
 ENV UV_LINK_MODE=copy
 
 COPY tests/api/pyproject.toml tests/api/uv.lock tests/api/README.md ./
+COPY tests/api/conftest_parts ./conftest_parts
 COPY tests/api/conftest.py ./
 COPY tests/api/config ./config
 COPY tests/api/services ./services
