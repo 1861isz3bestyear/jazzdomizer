@@ -5,7 +5,9 @@ This directory contains Python API tests for the relationship between Postgres d
 The tests use:
 
 - `pytest` as the test runner.
-- `playwright` for API HTTP requests.
+- `requests` for API HTTP requests.
+- `pydantic` for response validation.
+- `allure-pytest` for test annotations and optional Allure reports.
 - `psycopg` for direct database setup and verification.
 - `uv` for dependency management.
 

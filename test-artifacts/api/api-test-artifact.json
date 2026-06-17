@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-16T11:35:59.832758+00:00",
+  "generated_at": "2026-06-17T13:03:03.889737+00:00",
   "exitstatus": 0,
   "api_base_url": "http://backend:3000/api",
   "records": [
@@ -8,7 +8,7 @@
       "name": "created_song",
       "data": {
         "song_id": 10,
-        "song_name": "api_pytest_86b3eb7669_test_search_endpoint_reflects_song_inserted_in_database_d9f63e22_search",
+        "song_name": "api_pytest_0045ce51a2_test_search_endpoint_reflects_song_inserted_in_database_faa40798_search",
         "version": "pytest",
         "key": "C"
       }
@@ -17,12 +17,9 @@
       "test": "tests/test_db_backend_relationship.py::test_search_endpoint_reflects_song_inserted_in_database",
       "name": "search_result",
       "data": {
-        "endpoint": "http://backend:3000/api/songs/search/api_pytest_86b3eb7669_test_search_endpoint_reflects_song_inserted_in_database_d9f63e22_search",
-        "matched_song": {
-          "id": 10,
-          "description": "api_pytest_86b3eb7669_test_search_endpoint_reflects_song_inserted_in_database_d9f63e22_search",
-          "music_info": "C"
-        }
+        "id": 10,
+        "description": "api_pytest_0045ce51a2_test_search_endpoint_reflects_song_inserted_in_database_faa40798_search",
+        "music_info": "C"
       }
     },
     {
@@ -33,88 +30,44 @@
       ]
     },
     {
-      "test": "tests/test_db_backend_relationship.py::test_song_detail_endpoint_reads_description_and_harmony_from_database",
+      "test": "tests/test_db_backend_relationship.py::test_song_detail_and_transpose_read_harmony_without_mutating_database",
       "name": "created_song",
       "data": {
         "song_id": 11,
-        "song_name": "api_pytest_86b3eb7669_test_song_detail_endpoint_reads_description_and_harmony_from_database_0322cd51_detail",
+        "song_name": "api_pytest_0045ce51a2_test_song_detail_and_transpose_read_harmony_without_mutating_database_8547a460_detail",
         "version": "relationship",
         "key": "C"
       }
     },
     {
-      "test": "tests/test_db_backend_relationship.py::test_song_detail_endpoint_reads_description_and_harmony_from_database",
-      "name": "detail_result",
-      "data": {
-        "endpoint": "http://backend:3000/api/songs/11",
-        "detail": {
-          "id": 11,
-          "description": "api_pytest_86b3eb7669_test_song_detail_endpoint_reads_description_and_harmony_from_database_0322cd51_detail - relationship",
-          "music_info": "A)\n|Cmaj7/G |Am7     B)\n|Dm7     |G7      "
-        }
-      }
-    },
-    {
-      "test": "tests/test_db_backend_relationship.py::test_song_detail_endpoint_reads_description_and_harmony_from_database",
-      "name": "deleted_song_ids",
-      "data": [
-        11
-      ]
-    },
-    {
-      "test": "tests/test_db_backend_relationship.py::test_transpose_endpoint_uses_database_harmony_and_does_not_mutate_source_row",
+      "test": "tests/test_db_backend_relationship.py::test_song_detail_and_transpose_read_harmony_without_mutating_database",
       "name": "created_song",
       "data": {
         "song_id": 12,
-        "song_name": "api_pytest_86b3eb7669_test_transpose_endpoint_uses_database_harmony_and_does_not_mutate_source_row_296d57c8_transpose",
+        "song_name": "api_pytest_0045ce51a2_test_song_detail_and_transpose_read_harmony_without_mutating_database_8547a460_transpose",
         "version": "immutable",
         "key": "C"
       }
     },
     {
-      "test": "tests/test_db_backend_relationship.py::test_transpose_endpoint_uses_database_harmony_and_does_not_mutate_source_row",
-      "name": "transpose_result",
+      "test": "tests/test_db_backend_relationship.py::test_song_detail_and_transpose_read_harmony_without_mutating_database",
+      "name": "harmony_result",
       "data": {
-        "endpoint": "http://backend:3000/api/songs/12/transpose/2",
+        "detail": {
+          "id": 11,
+          "description": "api_pytest_0045ce51a2_test_song_detail_and_transpose_read_harmony_without_mutating_database_8547a460_detail - relationship",
+          "music_info": "A)\n|Cmaj7/G |Am7     B)\n|Dm7     |G7      "
+        },
         "transposed_music_info": "A)\n|Dmaj7/A |Bm7     |Em7     |A7      |\n",
         "stored_chords_after_request": "A) |Cmaj7/G|Am7|Dm7|G7|"
       }
     },
     {
-      "test": "tests/test_db_backend_relationship.py::test_transpose_endpoint_uses_database_harmony_and_does_not_mutate_source_row",
+      "test": "tests/test_db_backend_relationship.py::test_song_detail_and_transpose_read_harmony_without_mutating_database",
       "name": "deleted_song_ids",
       "data": [
+        11,
         12
-      ]
-    },
-    {
-      "test": "tests/test_db_backend_relationship.py::test_song_list_endpoint_includes_database_inserted_song",
-      "name": "created_song",
-      "data": {
-        "song_id": 13,
-        "song_name": "api_pytest_86b3eb7669_test_song_list_endpoint_includes_database_inserted_song_0d91a145_list",
-        "version": "visible",
-        "key": "F"
-      }
-    },
-    {
-      "test": "tests/test_db_backend_relationship.py::test_song_list_endpoint_includes_database_inserted_song",
-      "name": "list_result",
-      "data": {
-        "endpoint": "http://backend:3000/api/songs",
-        "matched_song": {
-          "id": 13,
-          "description": "api_pytest_86b3eb7669_test_song_list_endpoint_includes_database_inserted_song_0d91a145_list",
-          "music_info": "F"
-        },
-        "returned_count": 9
-      }
-    },
-    {
-      "test": "tests/test_db_backend_relationship.py::test_song_list_endpoint_includes_database_inserted_song",
-      "name": "deleted_song_ids",
-      "data": [
-        13
       ]
     }
   ],
@@ -122,22 +75,12 @@
     {
       "test": "tests/test_db_backend_relationship.py::test_search_endpoint_reflects_song_inserted_in_database",
       "outcome": "passed",
-      "duration_seconds": 0.007224166998639703
+      "duration_seconds": 0.00356087500040303
     },
     {
-      "test": "tests/test_db_backend_relationship.py::test_song_detail_endpoint_reads_description_and_harmony_from_database",
+      "test": "tests/test_db_backend_relationship.py::test_song_detail_and_transpose_read_harmony_without_mutating_database",
       "outcome": "passed",
-      "duration_seconds": 0.008320082997670397
-    },
-    {
-      "test": "tests/test_db_backend_relationship.py::test_transpose_endpoint_uses_database_harmony_and_does_not_mutate_source_row",
-      "outcome": "passed",
-      "duration_seconds": 0.0065900409972528
-    },
-    {
-      "test": "tests/test_db_backend_relationship.py::test_song_list_endpoint_includes_database_inserted_song",
-      "outcome": "passed",
-      "duration_seconds": 0.004237832996295765
+      "duration_seconds": 0.00782966699989629
     }
   ]
 }

@@ -1,22 +1,22 @@
+import json
 import os
-import re
-import time
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import quote
 
 import psycopg
 import pytest
-from playwright.sync_api import sync_playwright
+import requests
+
+from config.base_test import BaseApiService
+from services.harmony_changer.api_harmony import HarmonyApi
+from services.song_search.api_song_preview import SongPreviewApi
+from utils.helpers import unique_song_prefix
 
 
 def pytest_configure(config):
     artifact_dir = Path(
-        os.getenv(
-            "API_TEST_ARTIFACT_DIR",
-            Path(__file__).resolve().parents[1] / "artifacts",
-        )
+        os.getenv("API_TEST_ARTIFACT_DIR", Path(__file__).resolve().parent / "artifacts")
     )
     artifact_dir.mkdir(parents=True, exist_ok=True)
     config._api_artifact_dir = artifact_dir
@@ -46,12 +46,8 @@ def pytest_sessionfinish(session, exitstatus):
         "records": session.config._api_artifacts,
         "outcomes": session.config._api_outcomes,
     }
-
     artifact_path = session.config._api_artifact_dir / "api-test-artifact.json"
-    artifact_path.write_text(
-        __import__("json").dumps(artifact, indent=2, ensure_ascii=False),
-        encoding="utf-8",
-    )
+    artifact_path.write_text(json.dumps(artifact, indent=2), encoding="utf-8")
 
 
 @pytest.fixture(scope="session")
@@ -73,37 +69,26 @@ def run_id():
 
 
 @pytest.fixture(scope="session")
-def api_request_context(api_base_url):
-    with sync_playwright() as playwright:
-        request_context = playwright.request.new_context(
-            extra_http_headers={"Accept": "application/json"},
-        )
-        wait_for_backend_health(request_context, api_base_url)
-        yield request_context
-        request_context.dispose()
-
-
-def wait_for_backend_health(request_context, api_base_url, timeout_seconds=90):
-    deadline = time.monotonic() + timeout_seconds
-    last_error = None
-
-    while time.monotonic() < deadline:
-        try:
-            response = request_context.get(f"{api_base_url}/health", timeout=5_000)
-            if response.ok and response.json().get("success") is True:
-                return
-            last_error = f"health returned HTTP {response.status}"
-        except Exception as error:
-            last_error = str(error)
-        time.sleep(1)
-
-    raise AssertionError(f"backend health check did not pass: {last_error}")
+def api_session(api_base_url, database_url):
+    with requests.Session() as session:
+        BaseApiService(api_base_url, session).wait_for_health()
+        yield session
 
 
 @pytest.fixture
 def db_conn(database_url):
     with psycopg.connect(database_url) as conn:
         yield conn
+
+
+@pytest.fixture
+def song_preview_api(api_base_url, api_session):
+    return SongPreviewApi(api_base_url, api_session)
+
+
+@pytest.fixture
+def harmony_api(api_base_url, api_session):
+    return HarmonyApi(api_base_url, api_session)
 
 
 @pytest.fixture
@@ -123,26 +108,18 @@ def record_artifact(request):
 @pytest.fixture
 def isolated_song_factory(db_conn, run_id, request, record_artifact):
     created_song_ids = []
-    safe_test_name = re.sub(r"[^a-zA-Z0-9]+", "_", request.node.name).strip("_")
-    prefix = f"api_pytest_{run_id}_{safe_test_name}_{uuid.uuid4().hex[:8]}"
+    prefix = unique_song_prefix(run_id, request.node.name)
 
     def create_song(*, name_suffix, version, chords, key, key_alteration=0, complexity=0):
         song_name = f"{prefix}_{name_suffix}"
         with db_conn.cursor() as cursor:
             cursor.execute(
-                """
-                insert into songs (song_name, song_version)
-                values (%s, %s)
-                returning id
-                """,
+                "insert into songs (song_name, song_version) values (%s, %s) returning id",
                 (song_name, version),
             )
             song_id = cursor.fetchone()[0]
             cursor.execute(
-                """
-                insert into harmony (song_id, chords, key)
-                values (%s, %s, %s)
-                """,
+                "insert into harmony (song_id, chords, key) values (%s, %s, %s)",
                 (song_id, chords, key),
             )
             cursor.execute(
@@ -156,20 +133,9 @@ def isolated_song_factory(db_conn, run_id, request, record_artifact):
         created_song_ids.append(song_id)
         record_artifact(
             "created_song",
-            {
-                "song_id": song_id,
-                "song_name": song_name,
-                "version": version,
-                "key": key,
-            },
+            {"song_id": song_id, "song_name": song_name, "version": version, "key": key},
         )
-        return {
-            "id": song_id,
-            "name": song_name,
-            "version": version,
-            "chords": chords,
-            "key": key,
-        }
+        return {"id": song_id, "name": song_name, "version": version, "chords": chords}
 
     yield create_song
 
@@ -178,8 +144,3 @@ def isolated_song_factory(db_conn, run_id, request, record_artifact):
             cursor.execute("delete from songs where id = any(%s)", (created_song_ids,))
         db_conn.commit()
         record_artifact("deleted_song_ids", created_song_ids)
-
-
-@pytest.fixture
-def quote_path():
-    return lambda value: quote(str(value), safe="")

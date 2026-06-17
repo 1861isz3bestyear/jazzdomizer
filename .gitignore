@@ -17,10 +17,13 @@ node_modules/
 dist/
 build/
 
-# Python venv
+# Python tests
+*__pycache__
 tests/api/.venv
 tests/api/.pytest_cache
+tests/api/artifacts
 test_artifacts
+test-artifacts
 
 # Logs and temporary files
 *.log

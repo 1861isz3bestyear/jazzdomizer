@@ -1,0 +1,9 @@
+*
+
+!frontend/
+!frontend/nginx.conf
+!frontend/index.html
+!frontend/app.js
+!frontend/styles.css
+!frontend/components/
+!frontend/components/**
