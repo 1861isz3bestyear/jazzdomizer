@@ -51,13 +51,14 @@ def test_transpose_song(
     assert stored_chords == TRANSPOSE_SONG["chords"]
     assert "Cmaj7/G" in unchanged_detail.music_info
     assert "Dmaj7/A" not in unchanged_detail.music_info
-#     record_artifact(
-#         "harmony_result",
-#         {
-#             "detail": detail.model_dump(),
-#             "transposed_music_info": transposed.music_info,
-#             "stored_chords_after_request": stored_chords,
-#         },
+    record_artifact(
+        "harmony_result",
+        {
+#            "detail": harmony_api.deatail(detail_song["id"])
+            "transposed_music_info": transposed.music_info,
+            "stored_chords_after_request": stored_chords,
+        },
+    )
 # @allure.feature("Database and backend relationship")
 # def test_song_detail_and_transpose_read_harmony_without_mutating_database(
 #     harmony_api,

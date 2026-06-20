@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-20T11:56:04.185674+00:00",
+  "generated_at": "2026-06-20T12:56:59.079804+00:00",
   "exitstatus": 0,
   "api_base_url": "http://backend:3000/api",
   "records": [
@@ -8,7 +8,7 @@
       "name": "created_song",
       "data": {
         "song_id": 10,
-        "song_name": "api_pytest_3b98b7fce8_test_search_song_preview_by_name_c1e355aa_search",
+        "song_name": "api_pytest_f832c1317a_test_search_song_preview_by_name_02f82ad9_search",
         "version": "pytest",
         "key": "C"
       }
@@ -18,7 +18,7 @@
       "name": "search_result",
       "data": {
         "id": 10,
-        "description": "api_pytest_3b98b7fce8_test_search_song_preview_by_name_c1e355aa_search",
+        "description": "api_pytest_f832c1317a_test_search_song_preview_by_name_02f82ad9_search",
         "music_info": "C"
       }
     },
@@ -34,7 +34,7 @@
       "name": "created_song",
       "data": {
         "song_id": 11,
-        "song_name": "api_pytest_3b98b7fce8_test_search_song_detail_by_id_d163dc1f_detail",
+        "song_name": "api_pytest_f832c1317a_test_search_song_detail_by_id_36ed064b_detail",
         "version": "relationship",
         "key": "C"
       }
@@ -44,7 +44,7 @@
       "name": "search_result",
       "data": {
         "id": 11,
-        "name": "api_pytest_3b98b7fce8_test_search_song_detail_by_id_d163dc1f_detail",
+        "name": "api_pytest_f832c1317a_test_search_song_detail_by_id_36ed064b_detail",
         "version": "relationship",
         "chords": "A) |Cmaj7/G|Am7|\nB) |Dm7|G7|"
       }
@@ -61,9 +61,17 @@
       "name": "created_song",
       "data": {
         "song_id": 12,
-        "song_name": "api_pytest_3b98b7fce8_test_transpose_song_0a6b5f73_transpose",
+        "song_name": "api_pytest_f832c1317a_test_transpose_song_8f6836ba_transpose",
         "version": "immutable",
         "key": "C"
+      }
+    },
+    {
+      "test": "tests/test_db_backend_relationship.py::test_transpose_song",
+      "name": "harmony_result",
+      "data": {
+        "transposed_music_info": "A)\n|Dmaj7/A |Bm7     |Em7     |A7      |\n",
+        "stored_chords_after_request": "A) |Cmaj7/G|Am7|Dm7|G7|"
       }
     },
     {
@@ -78,17 +86,17 @@
     {
       "test": "tests/test_db_backend_relationship.py::test_search_song_preview_by_name",
       "outcome": "passed",
-      "duration_seconds": 0.005131792000156565
+      "duration_seconds": 0.004374208000172075
     },
     {
       "test": "tests/test_db_backend_relationship.py::test_search_song_detail_by_id",
       "outcome": "passed",
-      "duration_seconds": 0.0059229170001344755
+      "duration_seconds": 0.005766249999851425
     },
     {
       "test": "tests/test_db_backend_relationship.py::test_transpose_song",
       "outcome": "passed",
-      "duration_seconds": 0.003131166999992274
+      "duration_seconds": 0.003268041999945126
     }
   ]
 }
