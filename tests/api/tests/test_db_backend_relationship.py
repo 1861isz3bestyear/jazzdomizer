@@ -31,18 +31,26 @@ def test_search_song_detail_by_id(
     assert "A)" in detail.music_info
     assert "Cmaj7/G" in detail.music_info
     record_artifact("search_result", detail_song)
-#     transpose_song = isolated_song_factory(**TRANSPOSE_SONG)
-#     transposed = harmony_api.transpose(transpose_song["id"], steps=2)
-#     assert transposed.id == transpose_song["id"]
-#     assert "Dmaj7/A" in transposed.music_info
-#     assert "Bm7" in transposed.music_info
-#     with db_conn.cursor() as cursor:
-#         cursor.execute("select chords from harmony where song_id = %s", (transpose_song["id"],))
-#         stored_chords = cursor.fetchone()[0]
-#     unchanged_detail = harmony_api.detail(transpose_song["id"])
-#     assert stored_chords == TRANSPOSE_SONG["chords"]
-#     assert "Cmaj7/G" in unchanged_detail.music_info
-#     assert "Dmaj7/A" not in unchanged_detail.music_info
+
+@allure.feature("Transpose song")
+def test_transpose_song(
+        harmony_api,
+        db_conn,
+        isolated_song_factory,
+        record_artifact,
+):
+    transpose_song = isolated_song_factory(**TRANSPOSE_SONG)
+    transposed = harmony_api.transpose(transpose_song["id"], steps=2)
+    assert transposed.id == transpose_song["id"]
+    assert "Dmaj7/A" in transposed.music_info
+    assert "Bm7" in transposed.music_info
+    with db_conn.cursor() as cursor:
+         cursor.execute("select chords from harmony where song_id = %s", (transpose_song["id"],))
+         stored_chords = cursor.fetchone()[0]
+    unchanged_detail = harmony_api.detail(transpose_song["id"])
+    assert stored_chords == TRANSPOSE_SONG["chords"]
+    assert "Cmaj7/G" in unchanged_detail.music_info
+    assert "Dmaj7/A" not in unchanged_detail.music_info
 #     record_artifact(
 #         "harmony_result",
 #         {
