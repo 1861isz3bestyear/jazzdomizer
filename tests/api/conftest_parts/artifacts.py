@@ -29,7 +29,6 @@ def pytest_runtest_makereport(item, call):
             }
         )
 
-
 def pytest_sessionfinish(session, exitstatus):
     artifact = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -41,7 +40,6 @@ def pytest_sessionfinish(session, exitstatus):
     artifact_path = session.config._api_artifact_dir / "api-test-artifact.json"
     artifact_path.write_text(json.dumps(artifact, indent=2), encoding="utf-8")
 
-
 @pytest.fixture
 def record_artifact(request):
     def record(name, data):
@@ -52,5 +50,4 @@ def record_artifact(request):
                 "data": data,
             }
         )
-
     return record
