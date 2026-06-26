@@ -117,6 +117,7 @@ mod tests {
             bass,
         }
     }
+    #[test]
     fn test_chord_reading_from_db_string() {
         let test_cases = vec![
             ("C", Note::CNat, None, None),
@@ -210,5 +211,72 @@ mod tests {
                 chord, steps
             );
         }
+    }
+
+    #[test]
+    fn test_chord_reading_new_and_display() {
+        let chord = ChordForReading::new(Note::BFlat, Some("maj7"), Some(Note::FNat));
+        assert_eq!(chord.root, Note::BFlat);
+        assert_eq!(chord.color.as_deref(), Some("maj7"));
+        assert_eq!(chord.bass, Some(Note::FNat));
+        assert_eq!(chord.to_string(), "Bbmaj7/F");
+    }
+
+    #[test]
+    fn test_chord_reading_from_db_string_invalid_input() {
+        let result = ChordForReading::from_db_string("Hmaj7");
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("Ошибка парсинга аккорда"));
+    }
+
+    #[test]
+    fn test_quality_to_str_covers_all_variants() {
+        let cases = [
+            (Quality::Major, ""),
+            (Quality::Minor, "m"),
+            (Quality::Dom, "7"),
+            (Quality::HalfDim, "m7b5"),
+            (Quality::Dim, "dim"),
+            (Quality::Aug, "+"),
+            (Quality::Sus2, "sus2"),
+            (Quality::Sus4, "sus4"),
+        ];
+
+        for (quality, expected) in cases {
+            assert_eq!(quality.to_str(), expected);
+        }
+    }
+
+    #[test]
+    fn test_extension_to_str_covers_all_variants() {
+        let cases = [
+            (Extension::None, ""),
+            (Extension::Seven, "7"),
+            (Extension::FlatNinth, "b9"),
+            (Extension::Ninth, "9"),
+            (Extension::SharpNinth, "#9"),
+            (Extension::SharpEleven, "#11"),
+            (Extension::FlatThirteen, "b13"),
+        ];
+
+        for (extension, expected) in cases {
+            assert_eq!(extension.to_str(), expected);
+        }
+    }
+
+    #[test]
+    fn test_chord_for_writing_display_with_extensions_and_bass() {
+        let chord = ChordForWriting {
+            root: Note::CNat,
+            quality: Quality::Dom,
+            extensions: vec![
+                Extension::FlatNinth,
+                Extension::SharpEleven,
+                Extension::FlatThirteen,
+            ],
+            bass: Some(Note::ENat),
+        };
+
+        assert_eq!(chord.to_string(), "C7b9#11b13/E");
     }
 }

@@ -99,4 +99,26 @@ mod tests {
         let k = Key::new(Note::AFlat, Mode::Minor);
         assert_eq!(Key::from_db_string("G#m").unwrap(), k);
     }
+
+    #[test]
+    fn test_key_from_db_string_invalid_inputs() {
+        assert!(Key::from_db_string("Hm").is_err());
+        assert!(Key::from_db_string("").is_err());
+        assert!(Key::from_db_string("   ").is_err());
+    }
+
+    #[test]
+    fn test_key_index_next_and_alter_preserve_mode() {
+        let key = Key::new(Note::FNat, Mode::Minor);
+        assert_eq!(key.get_key_index(), Note::FNat.get_note_index());
+        assert_eq!(key.next_key(), Key::new(Note::CNat, Mode::Minor));
+        assert_eq!(key.alter_by_steps(2), Key::new(Note::GNat, Mode::Minor));
+        assert_eq!(key.alter_by_steps(-1), Key::new(Note::BFlat, Mode::Minor));
+    }
+
+    #[test]
+    fn test_key_display_uses_as_str() {
+        assert_eq!(Key::new(Note::BFlat, Mode::Major).to_string(), "Bb");
+        assert_eq!(Key::new(Note::CSharp, Mode::Minor).to_string(), "C#m");
+    }
 }

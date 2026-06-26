@@ -62,3 +62,51 @@ impl LocalSongList {
         })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use futures_util::FutureExt;
+    use sqlx::postgres::PgPoolOptions;
+    use std::panic::AssertUnwindSafe;
+    use std::time::Duration;
+
+    fn lazy_pool() -> sqlx::PgPool {
+        PgPoolOptions::new()
+            .max_connections(1)
+            .acquire_timeout(Duration::from_millis(25))
+            .connect_lazy("postgres://invalid:invalid@127.0.0.1:1/invalid?connect_timeout=1")
+            .unwrap()
+    }
+
+    #[tokio::test]
+    async fn global_song_list_new_returns_db_error_when_pool_is_unavailable() {
+        let pool = lazy_pool();
+        let result = GlobalSongList::new(4, &pool).await;
+        assert!(result.is_err());
+    }
+
+    #[tokio::test]
+    async fn global_song_list_next_local_playlist_panics_when_song_count_cannot_load() {
+        let pool = lazy_pool();
+        let result = AssertUnwindSafe(GlobalSongList::next_local_playlist(&pool))
+            .catch_unwind()
+            .await;
+
+        assert!(result.is_err());
+    }
+
+    #[tokio::test]
+    async fn local_song_list_check_practice_records_returns_db_error_when_pool_is_unavailable() {
+        let pool = lazy_pool();
+        let result = LocalSongList::check_practice_records(&pool).await;
+        assert!(result.is_err());
+    }
+
+    #[tokio::test]
+    async fn local_song_list_continue_session_returns_db_error_when_pool_is_unavailable() {
+        let pool = lazy_pool();
+        let result = LocalSongList::continue_session(&pool).await;
+        assert!(result.is_err());
+    }
+}

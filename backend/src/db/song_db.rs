@@ -334,8 +334,11 @@ impl SongPreviewRaw {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use sqlx::postgres::PgPoolOptions;
     use sqlx::PgPool;
+    use std::time::Duration;
 
+    #[cfg(not(coverage))]
     async fn arrange_song_data(pool: &PgPool) -> Result<(), sqlx::Error> {
         for statement in [
             r#"
@@ -399,11 +402,104 @@ mod tests {
         Ok(())
     }
 
+    #[cfg(not(coverage))]
     fn preview_ids(songs: &[SongPreviewRaw]) -> Vec<i32> {
         songs.iter().map(|song| song.song_id).collect()
     }
 
+    fn lazy_pool() -> PgPool {
+        PgPoolOptions::new()
+            .max_connections(1)
+            .acquire_timeout(Duration::from_millis(25))
+            .connect_lazy("postgres://invalid:invalid@127.0.0.1:1/invalid?connect_timeout=1")
+            .unwrap()
+    }
+
+    #[tokio::test]
+    async fn read_queries_return_errors_when_pool_is_unavailable() {
+        let pool = lazy_pool();
+
+        assert!(
+            SongDescription::get_song_description_by_id(&pool, 1)
+                .await
+                .is_err()
+        );
+        assert!(SongMusicInfo::get_song_music_info(&pool, 1).await.is_err());
+        assert!(SongListInfo::get_song_list_info(&pool, 1).await.is_err());
+        assert!(SongFullInfoRaw::get_all(&pool).await.is_err());
+        assert!(
+            SongFullInfoRaw::get_songs_by_part_name(&pool, "blue")
+                .await
+                .is_err()
+        );
+        assert!(SongPreviewRaw::get_all(&pool).await.is_err());
+        assert!(
+            SongPreviewRaw::get_songs_by_part_name(&pool, "blue")
+                .await
+                .is_err()
+        );
+        assert!(SongPreviewRaw::get_song_for_study(&pool).await.is_err());
+        assert!(
+            SongPreviewRaw::get_local_playlist_songs(&pool)
+                .await
+                .is_err()
+        );
+    }
+
+    #[tokio::test]
+    async fn empty_search_terms_short_circuit_without_database() {
+        let pool = lazy_pool();
+
+        assert!(
+            SongFullInfoRaw::get_songs_by_part_name(&pool, "")
+                .await
+                .unwrap()
+                .is_empty()
+        );
+        assert!(
+            SongPreviewRaw::get_songs_by_part_name(&pool, "")
+                .await
+                .unwrap()
+                .is_empty()
+        );
+    }
+
+    #[tokio::test]
+    async fn write_queries_return_errors_when_pool_is_unavailable() {
+        let pool = lazy_pool();
+
+        assert!(SongListInfo::drop_to_default(&pool).await.is_err());
+        assert!(SongListInfo::mark_song_for_study(&pool).await.is_err());
+        assert!(
+            SongListInfo::mark_songs_for_global_playlist(&pool)
+                .await
+                .is_err()
+        );
+        assert!(
+            SongListInfo::unmark_songs_for_global_playlist(&pool)
+                .await
+                .is_err()
+        );
+        assert!(
+            SongListInfo::mark_songs_for_local_playlist(4, &pool)
+                .await
+                .is_err()
+        );
+        assert!(
+            SongListInfo::get_song_amount_per_iteration(&pool)
+                .await
+                .is_err()
+        );
+        assert!(
+            SongListInfo::unmark_songs_for_local_playlist(&pool)
+                .await
+                .is_err()
+        );
+    }
+
     #[sqlx::test(migrations = false)]
+    #[ignore = "requires a configured Postgres test database"]
+    #[cfg(not(coverage))]
     async fn gets_song_description_by_id(pool: PgPool) -> Result<(), sqlx::Error> {
         arrange_song_data(&pool).await?;
         let song = SongDescription::get_song_description_by_id(&pool, 2)
@@ -421,6 +517,8 @@ mod tests {
     }
 
     #[sqlx::test(migrations = false)]
+    #[ignore = "requires a configured Postgres test database"]
+    #[cfg(not(coverage))]
     async fn gets_song_music_info(pool: PgPool) -> Result<(), sqlx::Error> {
         arrange_song_data(&pool).await?;
         let song = SongMusicInfo::get_song_music_info(&pool, 1)
@@ -438,6 +536,8 @@ mod tests {
     }
 
     #[sqlx::test(migrations = false)]
+    #[ignore = "requires a configured Postgres test database"]
+    #[cfg(not(coverage))]
     async fn gets_song_list_info(pool: PgPool) -> Result<(), sqlx::Error> {
         arrange_song_data(&pool).await?;
         let song = SongListInfo::get_song_list_info(&pool, 2)
@@ -455,6 +555,8 @@ mod tests {
     }
 
     #[sqlx::test(migrations = false)]
+    #[ignore = "requires a configured Postgres test database"]
+    #[cfg(not(coverage))]
     async fn resets_playlist_flags_to_default(pool: PgPool) -> Result<(), sqlx::Error> {
         arrange_song_data(&pool).await?;
         SongListInfo::drop_to_default(&pool).await?;
@@ -475,6 +577,8 @@ mod tests {
     }
 
     #[sqlx::test(migrations = false)]
+    #[ignore = "requires a configured Postgres test database"]
+    #[cfg(not(coverage))]
     async fn marks_latest_song_for_study(pool: PgPool) -> Result<(), sqlx::Error> {
         arrange_song_data(&pool).await?;
         SongListInfo::drop_to_default(&pool).await?;
@@ -489,6 +593,8 @@ mod tests {
     }
 
     #[sqlx::test(migrations = false)]
+    #[ignore = "requires a configured Postgres test database"]
+    #[cfg(not(coverage))]
     async fn builds_local_playlist_from_global_playlist(pool: PgPool) -> Result<(), sqlx::Error> {
         arrange_song_data(&pool).await?;
         SongListInfo::drop_to_default(&pool).await?;
@@ -502,6 +608,8 @@ mod tests {
     }
 
     #[sqlx::test(migrations = false)]
+    #[ignore = "requires a configured Postgres test database"]
+    #[cfg(not(coverage))]
     async fn unmarks_playlist_flags(pool: PgPool) -> Result<(), sqlx::Error> {
         arrange_song_data(&pool).await?;
         SongListInfo::drop_to_default(&pool).await?;
@@ -518,6 +626,8 @@ mod tests {
     }
 
     #[sqlx::test(migrations = false)]
+    #[ignore = "requires a configured Postgres test database"]
+    #[cfg(not(coverage))]
     async fn gets_all_full_song_info_in_name_order(pool: PgPool) -> Result<(), sqlx::Error> {
         arrange_song_data(&pool).await?;
         let songs = SongFullInfoRaw::get_all(&pool).await?;
@@ -541,6 +651,8 @@ mod tests {
     }
 
     #[sqlx::test(migrations = false)]
+    #[ignore = "requires a configured Postgres test database"]
+    #[cfg(not(coverage))]
     async fn searches_full_song_info_by_name_part(pool: PgPool) -> Result<(), sqlx::Error> {
         arrange_song_data(&pool).await?;
         assert!(
@@ -557,6 +669,8 @@ mod tests {
     }
 
     #[sqlx::test(migrations = false)]
+    #[ignore = "requires a configured Postgres test database"]
+    #[cfg(not(coverage))]
     async fn searches_preview_song_info_by_name_part(pool: PgPool) -> Result<(), sqlx::Error> {
         arrange_song_data(&pool).await?;
         assert!(
@@ -573,6 +687,8 @@ mod tests {
     }
 
     #[sqlx::test(migrations = false)]
+    #[ignore = "requires a configured Postgres test database"]
+    #[cfg(not(coverage))]
     async fn gets_preview_song_info(pool: PgPool) -> Result<(), sqlx::Error> {
         arrange_song_data(&pool).await?;
         let all_songs = SongPreviewRaw::get_all(&pool).await?;
